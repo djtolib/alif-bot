@@ -6,8 +6,8 @@ TOKEN = '7928863499:AAHcSn5rDqKXvtKsQK3w15IE0DBNSE_lhxI'
 CHAT_ID = '419777955'
 API_URL = 'https://alif.tj/api/rates/history?currency=rub&date='
 
-prev_rate = None
 
+# Можно сохранить предыдущее значение в файл или базе
 def get_rub_rate():
     today = datetime.now().strftime('%Y-%m-%d')
     url = API_URL + today
@@ -28,18 +28,25 @@ def send_telegram_message(text):
         'text': text
     }
     try:
-        response = requests.get(telegram_url, params=payload)
-        response.raise_for_status()
+        requests.get(telegram_url, params=payload).raise_for_status()
     except Exception as e:
         print(f"[!] Ошибка при отправке Telegram-сообщения: {e}")
 
-while True:
+def main():
     rate = get_rub_rate()
     if rate is not None:
-        if prev_rate is not None and rate != prev_rate:
-            send_telegram_message(f"📢 Курс RUB (покупка переводом) изменился: {prev_rate} → {rate}")
-        prev_rate = rate
+        with open("last_rate.txt", "r+") as f:
+            try:
+                prev_rate = float(f.read())
+            except:
+                prev_rate = None
+            if prev_rate is None or rate != prev_rate:
+                send_telegram_message(f"📢 Курс RUB изменился: {prev_rate} → {rate}")
+                f.seek(0)
+                f.write(str(rate))
+                f.truncate()
     else:
         print("[-] Не удалось получить курс RUB.")
-    
-    time.sleep(600)
+
+if __name__ == "__main__":
+    main()
