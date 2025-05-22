@@ -32,7 +32,7 @@ def send_telegram_message(text):
         response.raise_for_status()
     except Exception as e:
         print(f"[!] Ошибка при отправке Telegram-сообщения: {e}")
-
+print(f"[INFO] Скрипт запущен и проверяет курс...")
 while True:
     rate = get_rub_rate()
     if rate is not None:
