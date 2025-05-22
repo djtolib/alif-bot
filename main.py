@@ -34,6 +34,7 @@ def send_telegram_message(text):
         print(f"[!] Ошибка при отправке Telegram-сообщения: {e}")
 print(f"[INFO] Скрипт запущен и проверяет курс...")
 while True:
+    print("v cik")
     rate = get_rub_rate()
     if rate is not None:
         if prev_rate is not None and rate != prev_rate:
