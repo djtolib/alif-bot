@@ -40,7 +40,7 @@ if __name__ == "__main__":
         print("v cik")
         rate = get_rub_rate()
         if rate is not None:
-            if prev_rate is not None or rate != prev_rate:
+            if rate != prev_rate:
                 send_telegram_message(f"📢 Курс RUB (покупка переводом) изменился: {prev_rate} → {rate}")
             prev_rate = rate
         else:
