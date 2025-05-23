@@ -1,9 +1,8 @@
 import requests
 import time
+import os
 from datetime import datetime
 
-TOKEN = '7928863499:AAHcSn5rDqKXvtKsQK3w15IE0DBNSE_lhxI'
-CHAT_ID = '419777955'
 API_URL = 'https://alif.tj/api/rates/history?currency=rub&date='
 
 prev_rate = None
@@ -22,6 +21,9 @@ def get_rub_rate():
     return None
 
 def send_telegram_message(text):
+    TOKEN = os.getenv("TOKEN")
+    CHAT_ID = os.getenv("CHAT_ID")
+
     telegram_url = f'https://api.telegram.org/bot{TOKEN}/sendMessage'
     payload = {
         'chat_id': CHAT_ID,
@@ -37,7 +39,7 @@ while True:
     print("v cik")
     rate = get_rub_rate()
     if rate is not None:
-        if prev_rate is not None and rate != prev_rate:
+        if prev_rate is not None or rate != prev_rate:
             send_telegram_message(f"📢 Курс RUB (покупка переводом) изменился: {prev_rate} → {rate}")
         prev_rate = rate
     else:
