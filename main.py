@@ -34,15 +34,16 @@ def send_telegram_message(text):
         response.raise_for_status()
     except Exception as e:
         print(f"[!] Ошибка при отправке Telegram-сообщения: {e}")
-print(f"[INFO] Скрипт запущен и проверяет курс...")
-while True:
-    print("v cik")
-    rate = get_rub_rate()
-    if rate is not None:
-        if prev_rate is not None or rate != prev_rate:
-            send_telegram_message(f"📢 Курс RUB (покупка переводом) изменился: {prev_rate} → {rate}")
-        prev_rate = rate
-    else:
-        print("[-] Не удалось получить курс RUB.")
-    
-    time.sleep(600)
+if __name__ == "__main__":
+    print(f"[INFO] Скрипт запущен и проверяет курс...")
+    while True:
+        print("v cik")
+        rate = get_rub_rate()
+        if rate is not None:
+            if prev_rate is not None or rate != prev_rate:
+                send_telegram_message(f"📢 Курс RUB (покупка переводом) изменился: {prev_rate} → {rate}")
+            prev_rate = rate
+        else:
+            print("[-] Не удалось получить курс RUB.")
+        
+        time.sleep(600)
