@@ -1,11 +1,9 @@
 import requests
-import time
 import os
 from datetime import datetime
 
 API_URL = 'https://alif.tj/api/rates/history?currency=rub&date='
-
-prev_rate = None
+RATE_FILE = 'prev_rate.txt'
 
 def get_rub_rate():
     today = datetime.now().strftime('%Y-%m-%d')
@@ -34,16 +32,38 @@ def send_telegram_message(text):
         response.raise_for_status()
     except Exception as e:
         print(f"[!] Ошибка при отправке Telegram-сообщения: {e}")
+
+def load_prev_rate():
+    if os.path.exists(RATE_FILE):
+        try:
+            with open(RATE_FILE, 'r') as file:
+                return float(file.read().strip())
+        except Exception as e:
+            print(f"[!] Ошибка при чтении файла курса: {e}")
+    return None
+
+def save_prev_rate(rate):
+    try:
+        with open(RATE_FILE, 'w') as file:
+            file.write(str(rate))
+    except Exception as e:
+        print(f"[!] Ошибка при сохранении курса: {e}")
+
 if __name__ == "__main__":
-    print(f"[INFO] Скрипт запущен и проверяет курс...")
-    while True:
-        print("v cik")
-        rate = get_rub_rate()
-        if rate is not None:
-            if rate != prev_rate:
-                send_telegram_message(f"📢 Курс RUB (покупка переводом) изменился: {prev_rate} → {rate}")
-            prev_rate = rate
+    print("[INFO] Скрипт запущен.")
+    
+    prev_rate = load_prev_rate()
+    rate = get_rub_rate()
+
+    if rate is not None:
+        if prev_rate is None:
+            print(f"[INFO] Сохранён текущий курс: {rate}")
+            save_prev_rate(rate)
+        elif rate != prev_rate:
+            send_telegram_message(f"📢 Курс RUB (покупка переводом) изменился: {prev_rate} → {rate}")
+            save_prev_rate(rate)
+            print(f"[INFO] Курс изменился и обновлён в файле.")
         else:
-            print("[-] Не удалось получить курс RUB.")
-        
-        time.sleep(600)
+            print(f"[INFO] Курс не изменился: {rate}")
+    else:
+        print("[!] Не удалось получить текущий курс RUB.")
